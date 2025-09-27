@@ -1,0 +1,21 @@
+{
+  "name": "magicontent",
+  "version": "0.1.0",
+  "description": "Basic definitions and testing for the 'MagicBox' controller",
+  "keywords": "arduino",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/SamuelNoesslboeck/magicontent"
+  },
+  "authors":
+  [
+    {
+      "name": "Sy",
+      "email": "samuel.noesslboeck@gmail.com"
+    }
+  ],
+  "license": "MIT",
+  "frameworks": "*",
+  "platforms": "*"
+}
