@@ -14,37 +14,37 @@
 # define LOG_LEVEL LOG_LEVEL_TRACE
 
 /* BUTTON EVENTS */
-/// @brief Event to be called on button presses
+    /// @brief Event to be called on button presses
     void generic_button_event() {
         log_debugln("> Button pressed!");
     }
 
     void button_a1_pressed() {
         log_debugln("> Button A1 pressed!");
+        magicbox::music::start_playing(
+            &magicbox::music::melodies::BUTTON_A1
+        );
     }
 
     void button_a2_pressed() {
         log_debugln("> Button A2 pressed!");
+        magicbox::music::start_playing(
+            &magicbox::music::melodies::BUTTON_A2
+        );
     }
 
     void button_a3_pressed() {
         log_debugln("> Button A3 pressed!");
-        log_trace("(X: ");
-        log_trace(analogRead(MAGICBOX_PIN_JS_X));
-        log_trace(", Y: ");
-        log_trace(analogRead(MAGICBOX_PIN_JS_Y));
-        log_trace(")");
-        log_debug("\n");
+        magicbox::music::start_playing(
+            &magicbox::music::melodies::BUTTON_A3
+        );
     }
 
     void button_ult_pressed() {
         log_debugln("> Button ULT pressed!");
-        log_trace("(X: ");
-        log_trace(analogRead(MAGICBOX_PIN_JS_X));
-        log_trace(", Y: ");
-        log_trace(analogRead(MAGICBOX_PIN_JS_Y));
-        log_trace(")");
-        log_debug("\n");
+        magicbox::music::start_playing(
+            &magicbox::music::melodies::BUTTON_ULT
+        );
     }
 /**/
 
@@ -102,6 +102,8 @@ void setup() {
 
     magicbox::lcd.backlight();
     magicbox::lcd.print("MagicBox");
+
+    magicbox::music::start_playing(&magicbox::music::melodies::STARTUP);
 
     // Lora
     LoRa.setPins(MAGICBOX_LORA_SS, MAGICBOX_LORA_RST, MAGICBOX_LORA_D0);
