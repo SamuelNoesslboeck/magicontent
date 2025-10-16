@@ -2,7 +2,6 @@
 // ##    MAGICBOX - DEFINES   ##
 // #############################
 //
-// > Version 0.1.0
 
 # pragma once
 
@@ -22,7 +21,8 @@
 // ##############
 // ##   PINS   ##
 // ##############
-// > For full reference, see the circuit diagram
+// > For full reference, see the circuit diagram or the hardware reference
+// <https://github.com/SamuelNoesslboeck/MagicBox/blob/master/documentation/hardware_reference.md>
     // Inputs
     /// @brief Pin to measure the battery voltage from
     # define MAGICBOX_PIN_BAT 0     // TODO: Add battery voltage measuring
@@ -34,14 +34,14 @@
     /// @brief Analog value of the joystick in Y direction
     # define MAGICBOX_PIN_JS_Y 34
 
-    /// @brief Digital input of the first action switch
-    # define MAGICBOX_PIN_SW_A1 16
-    /// @brief Digital input of the second action switch
-    # define MAGICBOX_PIN_SW_A2 17
-    /// @brief Digital input of the third action switch
-    # define MAGICBOX_PIN_SW_A3 25
-    /// @brief Digital input of the ultimate action switch
-    # define MAGICBOX_PIN_SW_ULT 26
+    /// @brief Digital input of the first action button
+    # define MAGICBOX_PIN_BT_A1 16
+    /// @brief Digital input of the second action button
+    # define MAGICBOX_PIN_BT_A2 17
+    /// @brief Digital input of the third action button
+    # define MAGICBOX_PIN_BT_A3 25
+    /// @brief Digital input of the ultimate action button
+    # define MAGICBOX_PIN_BT_ULT 26
 
     /// @brief Digital input of the `DT` signal from the rotary encoder
     # define MAGICBOX_PIN_RE_DT 39
