@@ -10,6 +10,7 @@
 # include <sylo/logging.hpp>
 
 # include "magicontent/magicbox.hpp"
+# include "magicontent/music.hpp"
 
 # define LOG_LEVEL LOG_LEVEL_TRACE
 
@@ -105,8 +106,6 @@ void setup() {
 
     magicbox::music::start_playing(&magicbox::music::melodies::STARTUP);
 
-    // Lora
-
     magicbox::lcd.setCursor(0, 1);
     magicbox::lcd.print("LoRa OK");
 }
@@ -114,4 +113,11 @@ void setup() {
 void loop() {
     magicbox::loop();
     delay(10);
+
+    // Lora
+    LoRa.beginPacket();
+    LoRa.write((const uint8_t*)"Test", 5);
+    LoRa.endPacket();
+
+    delay(100);
 }
