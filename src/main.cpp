@@ -106,17 +106,6 @@ void setup() {
     magicbox::music::start_playing(&magicbox::music::melodies::STARTUP);
 
     // Lora
-    LoRa.setPins(MAGICBOX_LORA_SS, MAGICBOX_LORA_RST, MAGICBOX_LORA_D0);
-
-    log_debug("> Setting up LoRa ");
-
-    if (!LoRa.begin(433E6)) {   // Using american sender
-        log_debug(".");
-        delay(500);
-    }
-
-    LoRa.setSyncWord(0xAA);
-    log_debugln(" done!");
 
     magicbox::lcd.setCursor(0, 1);
     magicbox::lcd.print("LoRa OK");

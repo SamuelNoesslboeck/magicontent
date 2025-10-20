@@ -12,6 +12,7 @@
 # include <sylo/components/rotary_encoder.hpp>
 
 # include "defines.hpp"
+# include "mbcp.hpp"
 # include "music.hpp"
 
 namespace magicbox {
@@ -21,7 +22,7 @@ namespace magicbox {
         Negative = -1
     };
 
-    enum class JoyStickState {
+    enum class JoyStickState : uint8_t {
         None,
         N,
         NE,
@@ -60,6 +61,8 @@ namespace magicbox {
     //
 
     // Variables
+        static bool integrated_lora = true;
+
         static bool js_sw_pressed = false;
         static bool a1_pressed = false;
         static bool a2_pressed = false;
@@ -93,8 +96,16 @@ namespace magicbox {
         static RTrig js_sw_rtrig, a1_rtrig, a2_rtrig, a3_rtrig, ult_rtrig, encoder_rtrig;
     }
 
+    template<typename T>
+    void mbcp_send_msg(MBCPMsgType type, const T* obj) {
+        LoRa.beginPacket();
+        LoRa.write((uint8_t)type);
+        LoRa.write(obj, sizeof(T));
+        LoRa.endPacket();
+    }
+
     // Main events
-        void setup() {
+        void setup(bool integrated_lora = true) {
             // Setup pins
             // Inputs
             pinMode(MAGICBOX_PIN_BAT, INPUT);
@@ -118,6 +129,22 @@ namespace magicbox {
             // LCD
             lcd.init();
             lcd.backlight();
+
+            magicbox::integrated_lora = integrated_lora;
+
+            // LoRa
+            LoRa.setPins(MAGICBOX_LORA_SS, MAGICBOX_LORA_RST, MAGICBOX_LORA_D0);
+
+            log_debug("> Setting up LoRa ");
+
+            // Using american sender
+            if (!LoRa.begin(433E6)) {   
+                log_debug(".");
+                delay(500);
+            }
+
+            LoRa.setSyncWord(0xAA);
+            log_debugln(" done!");
         }
 
         void loop() {
@@ -152,6 +179,13 @@ namespace magicbox {
                 if (on_js_used) {
                     on_js_used(js_coord_x, js_coord_y);
                 }
+
+                if (integrated_lora) {
+                    const MBCPJoyStickMsg msg = MBCPJoyStickMsg {
+                        js_coord_x, js_coord_y
+                    };
+                    mbcp_send_msg(MBCPMsgType::JoyStick, &msg);
+                }
             }
 
             // Buttons
@@ -166,11 +200,25 @@ namespace magicbox {
                 if (on_js_sw_pressed) {
                     on_js_sw_pressed();
                 }
+
+                if (integrated_lora) {
+                    const MBCPButtonMsg msg = MBCPButtonMsg {
+                        MBCPButtonID::JS
+                    };
+                    mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
+                }
             }
 
             if (trig::a1_rtrig(a1_pressed)) {
                 if (on_a1_pressed) {
                     on_a1_pressed();
+                }
+
+                if (integrated_lora) {
+                    const MBCPButtonMsg msg = MBCPButtonMsg {
+                        MBCPButtonID::AB1
+                    };
+                    mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
                 }
             }
 
@@ -178,17 +226,39 @@ namespace magicbox {
                 if (on_a2_pressed) {
                     on_a2_pressed();
                 }
+
+                if (integrated_lora) {
+                    const MBCPButtonMsg msg = MBCPButtonMsg {
+                        MBCPButtonID::AB2
+                    };
+                    mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
+                }
             }
 
             if (trig::a3_rtrig(a3_pressed)) {
                 if (on_a3_pressed) {
                     on_a3_pressed();
                 }
+
+
+                if (integrated_lora) {
+                    const MBCPButtonMsg msg = MBCPButtonMsg {
+                        MBCPButtonID::AB3
+                    };
+                    mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
+                }
             }
 
             if (trig::ult_rtrig(ult_pressed)) {
                 if (on_ult_pressed) {
                     on_ult_pressed();
+                }
+
+                if (integrated_lora) {
+                    const MBCPButtonMsg msg = MBCPButtonMsg {
+                        MBCPButtonID::ULT
+                    };
+                    mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
                 }
             }
 
