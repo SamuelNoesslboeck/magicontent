@@ -3,8 +3,6 @@
 # include <Arduino.h>
 # include <inttypes.h>
 
-# include <sylo/music/notes.hpp>
-
 # include "defines.hpp"
 
 namespace magicbox {

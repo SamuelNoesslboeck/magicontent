@@ -3,8 +3,9 @@
 # include <Arduino.h>
 # include <inttypes.h>
 
+# include <sylo/music/notes.hpp>
+
 # include "magicontent/defines.hpp"
-# include "magicontent/notes.hpp"
 # include "magicontent/music.hpp"
 
 namespace magicbox {
@@ -52,7 +53,7 @@ namespace magicbox {
 
         namespace melodies {
             const Note STARTUP_NOTES[] = {
-                { 100, C5 }, { 50, BREAK }, { 100, E5 }, { 50, BREAK }, { 100, G5 }
+                { 100, NOTE_C5 }, { 50, BREAK }, { 100, E5 }, { 50, BREAK }, { 100, G5 }
             };
 
             const Melody STARTUP = {
