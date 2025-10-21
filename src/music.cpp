@@ -1,5 +1,3 @@
-# pragma once
-
 # include <Arduino.h>
 # include <inttypes.h>
 
@@ -53,7 +51,7 @@ namespace magicbox {
 
         namespace melodies {
             const Note STARTUP_NOTES[] = {
-                { 100, NOTE_C5 }, { 50, BREAK }, { 100, E5 }, { 50, BREAK }, { 100, G5 }
+                { 100, NOTE_C5 }, { 50, NOTE_BREAK }, { 100, NOTE_E5 }, { 50, NOTE_BREAK }, { 100, NOTE_G5 }
             };
 
             const Melody STARTUP = {
@@ -63,7 +61,7 @@ namespace magicbox {
 
 
             const Note BUTTON_A1_NOTES[] = {
-                { 100, C5 }
+                { 100, NOTE_C5 }
             };
 
             const Melody BUTTON_A1 = {
@@ -73,7 +71,7 @@ namespace magicbox {
 
 
             const Note BUTTON_A2_NOTES[] = {
-                { 100, C5 }, { 50, BREAK }, { 100, E5 }
+                { 100, NOTE_C5 }, { 50, NOTE_BREAK }, { 100, NOTE_E5 }
             };
 
             const Melody BUTTON_A2 = {
@@ -83,7 +81,7 @@ namespace magicbox {
 
 
             const Note BUTTON_A3_NOTES[] = {
-                { 100, C5 }, { 50, BREAK }, { 100, E5 }, { 50, BREAK }, { 100, G5 }
+                { 100, NOTE_C5 }, { 50, NOTE_BREAK }, { 100, NOTE_E5 }, { 50, NOTE_BREAK }, { 100, NOTE_G5 }
             };
 
             const Melody BUTTON_A3 = {
@@ -93,7 +91,7 @@ namespace magicbox {
 
 
             const Note BUTTON_ULT_NOTES[] = {
-                { 100, A5 }, { 50, BREAK }, { 100, A5 }, { 50, BREAK }, { 100, A5 }
+                { 100, NOTE_A5 }, { 50, NOTE_BREAK }, { 100, NOTE_A5 }, { 50, NOTE_BREAK }, { 100, NOTE_A5 }
             };
 
             const Melody BUTTON_ULT = {
