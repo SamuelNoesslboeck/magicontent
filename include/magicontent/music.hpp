@@ -3,8 +3,9 @@
 # include <Arduino.h>
 # include <inttypes.h>
 
+# include <sylo/music/notes.hpp>
+
 # include "defines.hpp"
-# include "notes.hpp"
 
 namespace magicbox {
     namespace music {
@@ -61,7 +62,7 @@ namespace magicbox {
 
         namespace melodies {
             static const Note STARTUP_NOTES[] = {
-                { 100, C5 }, { 50, BREAK }, { 100, E5 }, { 50, BREAK }, { 100, G5 }
+                { 100, NOTE_C5 }, { 50, NOTE_BREAK }, { 100, NOTE_E5 }, { 50, NOTE_BREAK }, { 100, NOTE_G5 }
             };
 
             static const Melody STARTUP = {
@@ -71,7 +72,7 @@ namespace magicbox {
 
 
             static const Note BUTTON_A1_NOTES[] = {
-                { 100, C5 }
+                { 100, NOTE_C5 }
             };
 
             static const Melody BUTTON_A1 = {
@@ -81,7 +82,7 @@ namespace magicbox {
 
 
             static const Note BUTTON_A2_NOTES[] = {
-                { 100, C5 }, { 50, BREAK }, { 100, E5 }
+                { 100, NOTE_C5 }, { 50, NOTE_BREAK }, { 100, NOTE_E5 }
             };
 
             static const Melody BUTTON_A2 = {
@@ -91,7 +92,7 @@ namespace magicbox {
 
 
             static const Note BUTTON_A3_NOTES[] = {
-                { 100, C5 }, { 50, BREAK }, { 100, E5 }, { 50, BREAK }, { 100, G5 }
+                { 100, NOTE_C5 }, { 50, NOTE_BREAK }, { 100, NOTE_E5 }, { 50, NOTE_BREAK }, { 100, NOTE_G5 }
             };
 
             static const Melody BUTTON_A3 = {
@@ -101,7 +102,7 @@ namespace magicbox {
 
 
             static const Note BUTTON_ULT_NOTES[] = {
-                { 100, A5 }, { 50, BREAK }, { 100, A5 }, { 50, BREAK }, { 100, A5 }
+                { 100, NOTE_A5 }, { 50, NOTE_BREAK }, { 100, NOTE_A5 }, { 50, NOTE_BREAK }, { 100, NOTE_A5 }
             };
 
             static const Melody BUTTON_ULT = {
