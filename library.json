@@ -1,6 +1,6 @@
 {
   "name": "magicontent",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Basic definitions and API for the 'MagicBox' controller",
   "keywords": [ "controller", "lora" ],
   "repository":

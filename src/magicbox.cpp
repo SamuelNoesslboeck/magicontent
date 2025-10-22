@@ -6,12 +6,6 @@
 
 // Sylo
 # include <sylo/logging.hpp>
-# include <sylo/types.hpp>
-# include <sylo/timing/toff.hpp>
-# include <sylo/triggers/comp.hpp>
-# include <sylo/triggers/ftrig.hpp>
-# include <sylo/triggers/rtrig.hpp>
-# include <sylo/components/rotary_encoder.hpp>
 
 # include "magicontent/defines.hpp"
 # include "magicontent/mbcp.hpp"
@@ -20,24 +14,8 @@
 
 namespace magicbox {
     // Events
-        JoyStickEvent on_js_used = nullptr;
-        EncoderEvent on_encoder_moved = nullptr;
-        
-        // On-Press
-        ButtonEvent on_js_sw_pressed = nullptr;
-        ButtonEvent on_a1_pressed = nullptr;
-        ButtonEvent on_a2_pressed = nullptr;
-        ButtonEvent on_a3_pressed = nullptr;
-        ButtonEvent on_ult_pressed = nullptr;
-        ButtonEvent on_encoder_pressed = nullptr;
-
-        // On-Release
-        ButtonEvent on_js_sw_released = nullptr;
-        ButtonEvent on_a1_released = nullptr;
-        ButtonEvent on_a2_released = nullptr;
-        ButtonEvent on_a3_released = nullptr;
-        ButtonEvent on_ult_released = nullptr;
-        ButtonEvent on_encoder_released = nullptr;
+        /// Internal events used when overriding the controller
+        EventGroup group;
     //
 
     // Variables
@@ -156,8 +134,8 @@ namespace magicbox {
 
             // Buttons
             if ((js_coord_x != JoyStickCoord::None) || (js_coord_y != JoyStickCoord::None)) {
-                if (on_js_used) {
-                    on_js_used(js_coord_x, js_coord_y);
+                if (events.on_js_used) {
+                    events.on_js_used(js_coord_x, js_coord_y);
                 }
 
                 if (integrated_lora) {
@@ -177,8 +155,8 @@ namespace magicbox {
 
             // On pressed
             if (trig::js_sw_rtrig(js_sw_pressed)) {
-                if (on_js_sw_pressed) {
-                    on_js_sw_pressed();
+                if (events.on_js_sw_pressed) {
+                    events.on_js_sw_pressed();
                 }
 
                 if (integrated_lora) {
@@ -190,8 +168,8 @@ namespace magicbox {
             }
 
             if (trig::a1_rtrig(a1_pressed)) {
-                if (on_a1_pressed) {
-                    on_a1_pressed();
+                if (events.on_a1_pressed) {
+                    events.on_a1_pressed();
                 }
 
                 if (integrated_lora) {
@@ -203,8 +181,8 @@ namespace magicbox {
             }
 
             if (trig::a2_rtrig(a2_pressed)) {
-                if (on_a2_pressed) {
-                    on_a2_pressed();
+                if (events.on_a2_pressed) {
+                    events.on_a2_pressed();
                 }
 
                 if (integrated_lora) {
@@ -216,8 +194,8 @@ namespace magicbox {
             }
 
             if (trig::a3_rtrig(a3_pressed)) {
-                if (on_a3_pressed) {
-                    on_a3_pressed();
+                if (events.on_a3_pressed) {
+                    events.on_a3_pressed();
                 }
 
 
@@ -230,8 +208,8 @@ namespace magicbox {
             }
 
             if (trig::ult_rtrig(ult_pressed)) {
-                if (on_ult_pressed) {
-                    on_ult_pressed();
+                if (events.on_ult_pressed) {
+                    events.on_ult_pressed();
                 }
 
                 if (integrated_lora) {
@@ -245,19 +223,19 @@ namespace magicbox {
             // On release
 
             // Potentiometer
-            if (on_encoder_moved) {
+            if (events.on_encoder_moved) {
                 RotaryMove move = encoder.check_rotary();
 
                 if (move == RotaryMove::CW) {
-                    on_encoder_moved(encoder.counter, Direction::CW);
+                    events.on_encoder_moved(encoder.counter, Direction::CW);
                 } else if (move == RotaryMove::CCW) {
-                    on_encoder_moved(encoder.counter, Direction::CCW);
+                    events.on_encoder_moved(encoder.counter, Direction::CCW);
                 }
             }
 
             if (trig::encoder_rtrig(time::encoder_toff(encoder.check_switch()))) {
-                if (on_encoder_pressed) {
-                    on_encoder_pressed();
+                if (events.on_encoder_pressed) {
+                    events.on_encoder_pressed();
                 }
             }
 
