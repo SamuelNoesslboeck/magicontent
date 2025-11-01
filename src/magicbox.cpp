@@ -90,7 +90,6 @@ namespace magicbox {
             // Inputs
             pinMode(MAGICBOX_PIN_BAT, INPUT);
 
-            pinMode(MAGICBOX_PIN_JS_SW, INPUT);
             pinMode(MAGICBOX_PIN_JS_X, INPUT);
             pinMode(MAGICBOX_PIN_JS_Y, INPUT);
             
@@ -169,25 +168,25 @@ namespace magicbox {
             }
 
             // Buttons
-            js_sw_pressed = time::js_sw_toff(digitalRead(MAGICBOX_PIN_JS_SW));
+            // js_sw_pressed = time::js_sw_toff(digitalRead(MAGICBOX_PIN_JS_SW));
             a1_pressed = time::a1_toff(digitalRead(MAGICBOX_PIN_BT_A1));
             a2_pressed = time::a2_toff(digitalRead(MAGICBOX_PIN_BT_A2));
             a3_pressed = time::a3_toff(digitalRead(MAGICBOX_PIN_BT_A3));
             ult_pressed = time::ult_toff(digitalRead(MAGICBOX_PIN_BT_ULT));
 
             // On pressed
-            if (trig::js_sw_rtrig(js_sw_pressed)) {
-                if (on_js_sw_pressed) {
-                    on_js_sw_pressed();
-                }
+            // if (trig::js_sw_rtrig(js_sw_pressed)) {
+            //     if (on_js_sw_pressed) {
+            //         on_js_sw_pressed();
+            //     }
 
-                if (integrated_lora) {
-                    const MBCPButtonMsg msg = MBCPButtonMsg {
-                        MBCPButtonID::JS
-                    };
-                    mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
-                }
-            }
+            //     if (integrated_lora) {
+            //         const MBCPButtonMsg msg = MBCPButtonMsg {
+            //             MBCPButtonID::JS
+            //         };
+            //         mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
+            //     }
+            // }
 
             if (trig::a1_rtrig(a1_pressed)) {
                 if (on_a1_pressed) {

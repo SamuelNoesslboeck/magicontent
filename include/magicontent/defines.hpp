@@ -27,8 +27,6 @@
     /// @brief Pin to measure the battery voltage from
     # define MAGICBOX_PIN_BAT 0     // TODO: Add battery voltage measuring
 
-    /// @brief Digital input of the joystick switch
-    # define MAGICBOX_PIN_JS_SW 36
     /// @brief Analog value of the joystick in X direction
     # define MAGICBOX_PIN_JS_X 4
     /// @brief Analog value of the joystick in Y direction
