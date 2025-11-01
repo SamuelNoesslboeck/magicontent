@@ -53,7 +53,10 @@
     # define MAGICBOX_PIN_BUZZER 2
     
     // LoRa
+    /// @brief Chip select Pin of the LoRa module
     # define MAGICBOX_LORA_SS 5
+    /// @brief Reset pin of the LoRa module
     # define MAGICBOX_LORA_RST 14
+    /// @brief The dataline of the LoRa module
     # define MAGICBOX_LORA_D0 27
 //

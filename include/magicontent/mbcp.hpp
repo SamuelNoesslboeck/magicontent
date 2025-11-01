@@ -3,13 +3,13 @@
 # include <inttypes.h>
 # include <sylo/types.hpp>
 
-# include "magicbox.hpp"
+# include "events.hpp"
 
 namespace magicbox {
     enum class MBCPMsgType {
         None, 
 
-        Ping,
+        // Ping,
 
         ButtonPressed, 
         ButtonReleased,
@@ -38,4 +38,6 @@ namespace magicbox {
         int32_t pos;
         Direction dir;
     };
+
+    void parse_mbcp_msg(EventGroup* events, const uint8_t* msg_buffer, uint8_t msg_len);
 }
