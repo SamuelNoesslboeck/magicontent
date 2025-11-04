@@ -26,8 +26,6 @@ namespace magicbox {
                 events->on_a3_pressed();
             } else if (msg.id == MBCPButtonID::ULT) {
                 events->on_ult_pressed();
-            } else if (msg.id == MBCPButtonID::JS) {
-                events->on_js_sw_pressed();
             } else if (msg.id == MBCPButtonID::RE) {
                 events->on_encoder_pressed();
             } else {

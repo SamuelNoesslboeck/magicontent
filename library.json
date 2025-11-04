@@ -29,5 +29,15 @@
       "version": "^0.8.0"
     }
   ],
+  "examples": [
+    {
+      "name": "MagicOS - Basic",
+      "path": "examples/magicos_basic"
+    },
+    {
+      "name": "MagicOS - Receiver test",
+      "path": "examples/magicos_recv_test"
+    }
+  ],
   "license": "MIT"
 }

@@ -15,11 +15,6 @@
 # define LOG_LEVEL LOG_LEVEL_TRACE
 
 /* BUTTON EVENTS */
-    /// @brief Event to be called on button presses
-    void generic_button_event() {
-        log_debugln("> Button pressed!");
-    }
-
     void button_a1_pressed() {
         log_debugln("> Button A1 pressed!");
         magicbox::music::start_playing(
@@ -49,32 +44,6 @@
     }
 /**/
 
-/// @brief Event to be called on movements of the rotary encoder
-/// @param pos The new position of the encoder
-/// @param dir The movement direction
-void encoder_event(int32_t pos, Direction dir) {
-    log_debug("> Encoder moved! ");
-    log_trace("(POS: ");
-    log_trace(pos);
-    log_trace(", DIR: ");
-    log_trace((bool)dir);
-    log_trace(")");
-    log_debug("\n");
-}
-
-/// @brief Event to be called on joystick movements
-/// @param x The current X position
-/// @param y The curernt Y position
-void joystick_event(magicbox::JoyStickCoord x, magicbox::JoyStickCoord y) {
-    log_debug("> Joystick active! ");
-    log_trace("(X: ");
-    log_trace((int8_t)x);
-    log_trace(", Y: ");
-    log_trace((int8_t)y);
-    log_trace(")");
-    log_debug("\n");
-}
-
 void setup() {
     init_logging(115200);
 
@@ -88,18 +57,15 @@ void setup() {
     log_debugln("Helper sketch to test the functionality of the MagicBox controller");
     log_info("");
     
-    magicbox::setup();
+    // Set integrated LoRa use to TRUE
+    magicbox::setup(true);
 
-    magicbox::on_js_used = joystick_event;
-    magicbox::on_js_sw_pressed = generic_button_event;
+    // magicbox::events.on_js_used = joystick_event;
 
-    magicbox::on_a1_pressed = button_a1_pressed;
-    magicbox::on_a2_pressed = button_a2_pressed;
-    magicbox::on_a3_pressed = button_a3_pressed;
-    magicbox::on_ult_pressed = button_ult_pressed;
-
-    magicbox::on_encoder_moved = encoder_event;
-    magicbox::on_encoder_pressed = generic_button_event;
+    magicbox::events.on_a1_pressed = button_a1_pressed;
+    magicbox::events.on_a2_pressed = button_a2_pressed;
+    magicbox::events.on_a3_pressed = button_a3_pressed;
+    magicbox::events.on_ult_pressed = button_ult_pressed;
 
     magicbox::lcd.backlight();
     magicbox::lcd.print("MagicBox");
@@ -113,11 +79,4 @@ void setup() {
 void loop() {
     magicbox::loop();
     delay(10);
-
-    // Lora
-    LoRa.beginPacket();
-    LoRa.write((const uint8_t*)"Test", 5);
-    LoRa.endPacket();
-
-    delay(100);
 }
