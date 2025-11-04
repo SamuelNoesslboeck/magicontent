@@ -28,7 +28,7 @@ namespace magicbox {
             if (active_melody) {
                 uint32_t note_playtime = millis() - note_stamp;
 
-                // Note ran out
+                // Check
                 if (note_playtime > active_melody->notes[note_idx].duration) {
                     note_idx++;
 

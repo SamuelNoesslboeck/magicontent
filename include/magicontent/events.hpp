@@ -21,25 +21,35 @@ namespace magicbox {
     /// Event for Potentiometer-Movements
     typedef void (*PotentioEvent)(uint16_t value, int16_t delta);
 
-    /// Structure containing all the events for the magicbox
+    /// Structure containing all the events for the MagicBox
     struct EventGroup {
+        /// Triggers each loop() iteration when the joystick is above the threshold positions
         JoyStickEvent on_js_used = nullptr;
+        /// Triggers every time a difference in the encoder position has been recorded
         EncoderEvent on_encoder_moved = nullptr;
         
         // On-Press
-        ButtonEvent on_js_sw_pressed = nullptr;
+        /// Triggers when the first ability switch has been pressed
         ButtonEvent on_a1_pressed = nullptr;
+        /// Triggers when the second ability switch has been pressed
         ButtonEvent on_a2_pressed = nullptr;
+        /// Triggers when the third ability switch has been pressed
         ButtonEvent on_a3_pressed = nullptr;
+        /// Triggers when the ultimate ability switch has been pressed
         ButtonEvent on_ult_pressed = nullptr;
+        /// Triggers when the encoder integrated switch has been pressed
         ButtonEvent on_encoder_pressed = nullptr;
 
         // On-Release
-        ButtonEvent on_js_sw_released = nullptr;
+        /// Triggers when the first ability switch has been released
         ButtonEvent on_a1_released = nullptr;
+        /// Triggers when the second ability switch has been released
         ButtonEvent on_a2_released = nullptr;
+        /// Triggers when the third ability switch has been released
         ButtonEvent on_a3_released = nullptr;
+        /// Triggers when the ultimate ability switch has been released
         ButtonEvent on_ult_released = nullptr;
+        /// Triggers when the encoder integrated switch has been released
         ButtonEvent on_encoder_released = nullptr;
     };
 }

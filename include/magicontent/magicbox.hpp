@@ -69,6 +69,7 @@ namespace magicbox {
 
     // Main events
         /// Setup all periphal devices and make the device operatable
+        /// @param integrated_lora Whether or not to use the integrated MBCP Lora messages
         void setup(bool integrated_lora = false); 
 
         /// Processes IO and fires events accordingly, should be called very regularly
