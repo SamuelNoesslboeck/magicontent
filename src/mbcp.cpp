@@ -1,7 +1,7 @@
 # include "magicontent/mbcp.hpp"
 
 namespace magicbox {
-    void parse_mbcp_msg(EventGroup* events, const uint8_t* msg_buffer, uint8_t msg_len) {
+    void mbcp_parse_msg(EventGroup* events, const uint8_t* msg_buffer, uint8_t msg_len) {
         if (msg_len == 0) {
             // Return error
         }
@@ -11,6 +11,9 @@ namespace magicbox {
         // Check the message type and fire events accordingly
         if (msg_type == MBCPMsgType::None) {
             // Error
+        } else if (msg_type == MBCPMsgType::Ping) {
+            events->on_ping();
+            
         } else if (msg_type == MBCPMsgType::ButtonPressed) {
             if (msg_len < (1 + sizeof(MBCPButtonMsg))) {
                 // Error

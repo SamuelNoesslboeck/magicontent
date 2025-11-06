@@ -10,7 +10,7 @@ namespace magicbox {
     enum class MBCPMsgType : uint8_t {
         None = 0x00, 
 
-        // Ping, TODO: Integrate ping
+        Ping,
 
         ButtonPressed, 
         ButtonReleased,
@@ -26,6 +26,11 @@ namespace magicbox {
         ULT = 0x0F, 
         RE = 0x11
     };
+
+    /// Contents of a ping message
+    struct MBCPPingMsg {
+        uint8_t __placeholder;
+    }; 
 
     /// Contents of a button type message
     struct MBCPButtonMsg {
@@ -49,5 +54,5 @@ namespace magicbox {
     /// @param events The eventgroup with your custom events
     /// @param msg_buffer The byte-buffer of your incoming message
     /// @param msg_len The length of your incoming message
-    void parse_mbcp_msg(EventGroup* events, const uint8_t* msg_buffer, uint8_t msg_len);
+    void mbcp_parse_msg(EventGroup* events, const uint8_t* msg_buffer, uint8_t msg_len);
 }

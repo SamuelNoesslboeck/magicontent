@@ -9,10 +9,10 @@
 
 # include <sylo/logging.hpp>
 
+# define LOG_LEVEL LOG_LEVEL_TRACE
+
 # include "magicontent/magicbox.hpp"
 # include "magicontent/music.hpp"
-
-# define LOG_LEVEL LOG_LEVEL_TRACE
 
 /* BUTTON EVENTS */
     void button_a1_pressed() {

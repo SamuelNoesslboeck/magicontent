@@ -5,6 +5,7 @@
 
 // Sylo
 # include <sylo/types.hpp>
+# include <sylo/timing/timer.hpp>
 # include <sylo/timing/toff.hpp>
 # include <sylo/triggers/comp.hpp>
 # include <sylo/triggers/ftrig.hpp>
@@ -12,11 +13,14 @@
 # include <sylo/components/rotary_encoder.hpp>
 
 # include "events.hpp"
+# include "conn.hpp"
 
 /// Collection of functions, datatypes and variables to utilize the MagicBox controller
 namespace magicbox {
     /// General, internal events of the magicbox
     extern EventGroup events;
+    /// Tracking LoRa/BT ping requests and checking connection status
+    extern ConnHandler connection;
 
     // Variables
         /// Config variable whether or not to use library integrated LoRa
@@ -58,6 +62,10 @@ namespace magicbox {
             a3_toff ,
             ult_toff,
             encoder_toff;
+
+        /// Internal timer for ping tracing
+        extern Timer 
+            ping_timer;
     }
 
     /// Trigger components for the MagicBox
@@ -70,7 +78,7 @@ namespace magicbox {
     // Main events
         /// Setup all periphal devices and make the device operatable
         /// @param integrated_lora Whether or not to use the integrated MBCP Lora messages
-        void setup(bool integrated_lora = false); 
+        void setup(bool integrated_lora = false, uint16_t sync_word = 0xAA); 
 
         /// Processes IO and fires events accordingly, should be called very regularly
         void loop();

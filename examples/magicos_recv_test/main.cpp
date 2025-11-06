@@ -1,4 +1,5 @@
 # include <LoRa.h>
+# include <magicontent/mbcp.hpp>
 
 # define LORA_SS 5
 # define LORA_RST 14
@@ -16,24 +17,34 @@ void setup() {
     }
 
     LoRa.setSyncWord(0xAA);
+    LoRa.setTimeout(50);
     Serial.println(" done!");
 }
+
+uint8_t LoRaData [64];
 
 void loop() {
   // try to parse packet
   int packetSize = LoRa.parsePacket();
   if (packetSize) {
     // received a packet
-    Serial.print("Received packet '");
+    Serial.print("Received packet with length ");
 
     // read packet
     while (LoRa.available()) {
-      String LoRaData = LoRa.readString();
-      Serial.print(LoRaData); 
+      uint8_t msg_len = LoRa.readBytes(LoRaData, 64);
+      Serial.print((int)msg_len);
+
+      if ((magicbox::MBCPMsgType)(LoRaData[0]) == magicbox::MBCPMsgType::Ping) {
+        LoRa.beginPacket();
+        LoRa.write((uint8_t)magicbox::MBCPMsgType::Ping);
+        LoRa.endPacket();
+        Serial.print(" (ping request)");
+      }
     }
 
     // print RSSI of packet
-    Serial.print("' with RSSI ");
+    Serial.print(" with RSSI ");
     Serial.println(LoRa.packetRssi());
   }
 }

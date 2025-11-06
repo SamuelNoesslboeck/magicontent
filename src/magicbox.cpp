@@ -1,5 +1,3 @@
-# pragma once
-
 # include <Arduino.h>
 # include <LiquidCrystal_I2C.h>
 # include <LoRa.h>
@@ -12,10 +10,12 @@
 # include "magicontent/music.hpp"
 # include "magicontent/magicbox.hpp"
 
+# define LOG_LEVEL LOG_LEVEL_TRACE
+
 namespace magicbox {
     // Events
-        /// Internal events used when overriding the controller
-        EventGroup group;
+        EventGroup events;
+        ConnHandler connection;
     //
 
     // Variables
@@ -30,6 +30,9 @@ namespace magicbox {
 
         int16_t js_x, js_y;
         JoyStickCoord js_coord_x, js_coord_y;
+
+        int16_t last_rssi;
+        uint8_t lora_buff [64];
     // 
 
     // Objects
@@ -46,6 +49,9 @@ namespace magicbox {
             a3_toff (MAGICBOX_BUTTON_TIME),
             ult_toff (MAGICBOX_BUTTON_TIME),
             encoder_toff (MAGICBOX_BUTTON_TIME);
+
+        Timer 
+            ping_timer (500);
     }
 
     /// Trigger components for the MagicBox
@@ -62,8 +68,19 @@ namespace magicbox {
         LoRa.endPacket();
     }
 
+    // System events
+        void on_ping() {
+            connection.finish_ping(last_rssi);
+            log_debug("> Ping received with ");
+            log_debug(connection.ping);
+            log_debug("ms and ");
+            log_debug(connection.rssi);
+            log_debug(" RSSI \n");
+        }
+    // 
+
     // Main events
-        void setup(bool integrated_lora) {
+        void setup(bool integrated_lora, uint16_t sync_word) {
             // Setup pins
             // Inputs
             pinMode(MAGICBOX_PIN_BAT, INPUT);
@@ -91,6 +108,7 @@ namespace magicbox {
 
             // LoRa
             LoRa.setPins(MAGICBOX_LORA_SS, MAGICBOX_LORA_RST, MAGICBOX_LORA_D0);
+            LoRa.setTimeout(50);
 
             log_debug("> Setting up LoRa ");
 
@@ -100,11 +118,37 @@ namespace magicbox {
                 delay(500);
             }
 
-            LoRa.setSyncWord(0xAA);
+            LoRa.setSyncWord(sync_word);
             log_debugln(" done!");
+
+            // Pinging
+            time::ping_timer.set();
+            events.on_ping = on_ping;
         }
 
         void loop() {
+            // Connection
+            if (time::ping_timer.has_elapsed()) {
+                MBCPPingMsg msg = { 0 };
+
+                connection.start_ping();
+                mbcp_send_msg(MBCPMsgType::Ping, &msg);
+                time::ping_timer.set();
+            }
+
+            // LoRa incomming
+            int packetSize = LoRa.parsePacket();
+            if (packetSize) {
+                while (LoRa.available()) {
+                    size_t msg_len = LoRa.readBytes(lora_buff, 64);
+                    last_rssi = LoRa.packetRssi();
+                    mbcp_parse_msg(&events, lora_buff, msg_len);
+                }
+            }
+
+            // ############
+            // ## INPUTS ##
+            // ############
             // Joystick
             // Reduce accuracy to 8 bit and remove default pos
             js_x = (int16_t)(analogRead(MAGICBOX_PIN_JS_X) >> 4) - (int16_t)MAGICBOX_JS_X_DEF;   

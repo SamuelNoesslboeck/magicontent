@@ -12,6 +12,8 @@ namespace magicbox {
         Negative = -1
     };
 
+    /// Event for reiving a ping trace
+    typedef void (*PingEvent)();
     /// Event for Button press & release
     typedef void (*ButtonEvent)();
     /// Event for movements of a rotary encoder
@@ -23,6 +25,9 @@ namespace magicbox {
 
     /// Structure containing all the events for the MagicBox
     struct EventGroup {
+        /// Event for reiving a ping trace from the controller/receiving device
+        PingEvent on_ping = nullptr;
+
         /// Triggers each loop() iteration when the joystick is above the threshold positions
         JoyStickEvent on_js_used = nullptr;
         /// Triggers every time a difference in the encoder position has been recorded
