@@ -30,7 +30,7 @@ namespace magicbox {
             } else if (msg.id == MBCPButtonID::ULT) {
                 events->on_ult_pressed();
             } else if (msg.id == MBCPButtonID::RE) {
-                events->on_encoder_pressed();
+                events->on_encoder_sw_pressed();
             } else {
                 // Error
             }

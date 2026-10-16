@@ -26,7 +26,7 @@ namespace magicbox {
         bool a2_pressed = false;
         bool a3_pressed = false;
         bool ult_pressed = false;
-        bool encoder_pressed = false;
+        bool re_sw_pressed = false;
 
         int16_t js_x, js_y;
         JoyStickCoord js_coord_x, js_coord_y;
@@ -36,7 +36,7 @@ namespace magicbox {
     // 
 
     // Objects
-        LiquidCrystal_I2C lcd(0x27, 16, 2);
+        LiquidCrystal_I2C lcd(0x27, 20, 4);
         RotaryEncoder encoder (MAGICBOX_PIN_RE_SW, MAGICBOX_PIN_RE_DT, MAGICBOX_PIN_RE_CL);
     // 
 
@@ -48,7 +48,7 @@ namespace magicbox {
             a2_toff (MAGICBOX_BUTTON_TIME),
             a3_toff (MAGICBOX_BUTTON_TIME),
             ult_toff (MAGICBOX_BUTTON_TIME),
-            encoder_toff (MAGICBOX_BUTTON_TIME);
+            re_sw_toff (MAGICBOX_BUTTON_TIME);
 
         Timer 
             ping_timer (500);
@@ -56,8 +56,8 @@ namespace magicbox {
 
     /// Trigger components for the MagicBox
     namespace trig {
-        FTrig js_sw_ftrig, a1_ftrig, a2_ftrig, a3_ftrig, ult_ftrig, encoder_ftrig;
-        RTrig js_sw_rtrig, a1_rtrig, a2_rtrig, a3_rtrig, ult_rtrig, encoder_rtrig;
+        FTrig js_sw_ftrig, a1_ftrig, a2_ftrig, a3_ftrig, ult_ftrig, re_sw_ftrig;
+        RTrig js_sw_rtrig, a1_rtrig, a2_rtrig, a3_rtrig, ult_rtrig, re_sw_rtrig;
     }
 
     template<typename T>
@@ -87,15 +87,16 @@ namespace magicbox {
 
             pinMode(MAGICBOX_PIN_JS_X, INPUT);
             pinMode(MAGICBOX_PIN_JS_Y, INPUT);
+            pinMode(MAGICBOX_PIN_JS_SW, INPUT_PULLDOWN); 
             
-            pinMode(MAGICBOX_PIN_BT_A1, INPUT);
-            pinMode(MAGICBOX_PIN_BT_A2, INPUT);
-            pinMode(MAGICBOX_PIN_BT_A3, INPUT);
-            pinMode(MAGICBOX_PIN_BT_ULT, INPUT);
+            pinMode(MAGICBOX_PIN_BT_A1, INPUT_PULLDOWN);
+            pinMode(MAGICBOX_PIN_BT_A2, INPUT_PULLDOWN);
+            pinMode(MAGICBOX_PIN_BT_A3, INPUT_PULLDOWN);
+            pinMode(MAGICBOX_PIN_BT_ULT, INPUT_PULLDOWN);
 
-            pinMode(MAGICBOX_PIN_RE_DT, INPUT);
+            pinMode(MAGICBOX_PIN_RE_DT, INPUT);     
             pinMode(MAGICBOX_PIN_RE_CL, INPUT);
-            pinMode(MAGICBOX_PIN_RE_SW, INPUT);
+            pinMode(MAGICBOX_PIN_RE_SW, INPUT);     // Integrated switch does not need pulldown
 
             // Outputs
             pinMode(MAGICBOX_PIN_BUZZER, OUTPUT);
@@ -127,7 +128,7 @@ namespace magicbox {
         }
 
         void loop() {
-            // Connection
+            // // Connection
             if (time::ping_timer.has_elapsed()) {
                 MBCPPingMsg msg = { 0 };
 
@@ -175,39 +176,39 @@ namespace magicbox {
                 js_coord_y = JoyStickCoord::None;
             }
 
-            // Buttons
             if ((js_coord_x != JoyStickCoord::None) || (js_coord_y != JoyStickCoord::None)) {
                 if (events.on_js_used) {
                     events.on_js_used(js_coord_x, js_coord_y);
                 }
 
-                if (integrated_lora) {
-                    const MBCPJoyStickMsg msg = MBCPJoyStickMsg {
-                        js_coord_x, js_coord_y
-                    };
-                    mbcp_send_msg(MBCPMsgType::JoyStick, &msg);
-                }
+                // if (integrated_lora) {
+                //     const MBCPJoyStickMsg msg = MBCPJoyStickMsg {
+                //         js_coord_x, js_coord_y
+                //     };
+                //     mbcp_send_msg(MBCPMsgType::JoyStick, &msg);
+                // }
             }
 
             // Buttons
-            // js_sw_pressed = time::js_sw_toff(digitalRead(MAGICBOX_PIN_JS_SW));
+            js_sw_pressed = time::js_sw_toff(digitalRead(MAGICBOX_PIN_JS_SW));
             a1_pressed = time::a1_toff(digitalRead(MAGICBOX_PIN_BT_A1));
             a2_pressed = time::a2_toff(digitalRead(MAGICBOX_PIN_BT_A2));
             a3_pressed = time::a3_toff(digitalRead(MAGICBOX_PIN_BT_A3));
             ult_pressed = time::ult_toff(digitalRead(MAGICBOX_PIN_BT_ULT));
 
             // On pressed
-            // if (trig::js_sw_rtrig(js_sw_pressed)) {
-            //     if (on_js_sw_pressed) {
-            //         on_js_sw_pressed();
-            //     }
-            //     if (integrated_lora) {
-            //         const MBCPButtonMsg msg = MBCPButtonMsg {
-            //             MBCPButtonID::JS
-            //         };
-            //         mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
-            //     }
-            // }
+            if (trig::js_sw_rtrig(js_sw_pressed)) {
+                if (events.on_js_sw_pressed) {
+                    events.on_js_sw_pressed();
+                }
+
+                // if (integrated_lora) {
+                //     const MBCPButtonMsg msg = MBCPButtonMsg {
+                //         MBCPButtonID::JS
+                //     };
+                //     mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
+                // }
+            }
 
             if (trig::a1_rtrig(a1_pressed)) {
                 if (events.on_a1_pressed) {
@@ -262,9 +263,15 @@ namespace magicbox {
                 }
             }
 
+            if (trig::re_sw_rtrig(time::re_sw_toff(encoder.check_switch()))) {
+                if (events.on_encoder_sw_pressed) {
+                    events.on_encoder_sw_pressed();
+                }
+            }
+
             // On release
 
-            // Potentiometer
+            // Rotary encoder
             if (events.on_encoder_moved) {
                 RotaryMove move = encoder.check_rotary();
 
@@ -272,12 +279,6 @@ namespace magicbox {
                     events.on_encoder_moved(encoder.counter, Direction::CW);
                 } else if (move == RotaryMove::CCW) {
                     events.on_encoder_moved(encoder.counter, Direction::CCW);
-                }
-            }
-
-            if (trig::encoder_rtrig(time::encoder_toff(encoder.check_switch()))) {
-                if (events.on_encoder_pressed) {
-                    events.on_encoder_pressed();
                 }
             }
 

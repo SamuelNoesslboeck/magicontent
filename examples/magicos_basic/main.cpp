@@ -13,6 +13,7 @@
 
 # include "magicontent/magicbox.hpp"
 # include "magicontent/music.hpp"
+# include "magicontent/mbcp.hpp"
 
 /* BUTTON EVENTS */
     void button_a1_pressed() {
@@ -41,6 +42,27 @@
         magicbox::music::start_playing(
             &magicbox::music::melodies::BUTTON_ULT
         );
+
+        // magicbox::MBCPButtonMsg msg = {
+        //     magicbox::MBCPButtonID::ULT
+        // };
+
+        // LoRa.beginPacket();
+        // LoRa.write((uint8_t)magicbox::MBCPMsgType::ButtonPressed);
+        // LoRa.write((const uint8_t*)&msg, sizeof(magicbox::MBCPButtonMsg));
+        // LoRa.endPacket();   
+    }
+/**/
+
+/* ROTARY ENCODER EVENTS */
+    void button_re_pressed() {
+        log_debugln("> Button RE pressed!");
+    } 
+/**/
+
+/* JOYSTICK EVENTS */
+    void button_js_used() {
+        log_debugln("> Button JS used!");
     }
 /**/
 
@@ -62,11 +84,17 @@ void setup() {
 
     // magicbox::events.on_js_used = joystick_event;
 
+    // Events
     magicbox::events.on_a1_pressed = button_a1_pressed;
     magicbox::events.on_a2_pressed = button_a2_pressed;
     magicbox::events.on_a3_pressed = button_a3_pressed;
     magicbox::events.on_ult_pressed = button_ult_pressed;
 
+    magicbox::events.on_encoder_sw_pressed = button_re_pressed;
+
+    magicbox::events.on_js_sw_pressed = button_js_used;
+
+    // LCD    
     magicbox::lcd.backlight();
     magicbox::lcd.print("MagicBox");
 

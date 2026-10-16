@@ -36,8 +36,8 @@ namespace magicbox {
         extern bool a3_pressed;
         /// Whether the ultimate ability switch is currently being pressed (not an event)
         extern bool ult_pressed;
-        /// Whether the encoder switch is currently being pressed (not an event)
-        extern bool encoder_pressed;
+        /// Whether the rotary encoder switch is currently being pressed (not an event)
+        extern bool re_sw_pressed;
 
         /// Raw input numbers of the JoyStick
         extern int16_t js_x, js_y;
@@ -61,7 +61,7 @@ namespace magicbox {
             a2_toff,
             a3_toff ,
             ult_toff,
-            encoder_toff;
+            re_sw_toff;
 
         /// Internal timer for ping tracing
         extern Timer 
@@ -71,8 +71,8 @@ namespace magicbox {
     /// Trigger components for the MagicBox
     namespace trig {
         /// Falling trigger 
-        extern FTrig js_sw_ftrig, a1_ftrig, a2_ftrig, a3_ftrig, ult_ftrig, encoder_ftrig;
-        extern RTrig js_sw_rtrig, a1_rtrig, a2_rtrig, a3_rtrig, ult_rtrig, encoder_rtrig;
+        extern FTrig js_sw_ftrig, a1_ftrig, a2_ftrig, a3_ftrig, ult_ftrig, re_sw_ftrig;
+        extern RTrig js_sw_rtrig, a1_rtrig, a2_rtrig, a3_rtrig, ult_rtrig, re_sw_rtrig;
     }
 
     // Main events

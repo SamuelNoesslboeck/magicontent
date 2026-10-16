@@ -43,7 +43,9 @@ namespace magicbox {
         /// Triggers when the ultimate ability switch has been pressed
         ButtonEvent on_ult_pressed = nullptr;
         /// Triggers when the encoder integrated switch has been pressed
-        ButtonEvent on_encoder_pressed = nullptr;
+        ButtonEvent on_encoder_sw_pressed = nullptr;
+        /// Triggers when the JoyStick integrated switch has been pressed
+        ButtonEvent on_js_sw_pressed = nullptr;
 
         // On-Release
         /// Triggers when the first ability switch has been released
@@ -55,6 +57,8 @@ namespace magicbox {
         /// Triggers when the ultimate ability switch has been released
         ButtonEvent on_ult_released = nullptr;
         /// Triggers when the encoder integrated switch has been released
-        ButtonEvent on_encoder_released = nullptr;
+        ButtonEvent on_encoder_sw_released = nullptr;
+        /// Triggers when the JoyStick integrated switch has been released
+        ButtonEvent on_js_sw_released = nullptr;   
     };
 }

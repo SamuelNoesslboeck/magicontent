@@ -8,5 +8,6 @@ Pre-made programs for direct use and other useful examples can be found in the `
 
 ```sh
 pio check -e magicos_basic   # Code check
-pio run -e magicos_basic              
+pio run -e magicos_basic     # Compile
+pio run -e magicos_basic --target upload --upload-port <PORT>  # Upload         
 ```

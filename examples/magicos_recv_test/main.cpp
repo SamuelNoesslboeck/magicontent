@@ -3,7 +3,7 @@
 
 # define LORA_SS 5
 # define LORA_RST 14
-# define LORA_D0 17
+# define LORA_D0 27
 
 void setup() {
     Serial.begin(115200);
