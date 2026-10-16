@@ -8,8 +8,6 @@
 // Settings
 /// @brief Minimum time between button signals to be registered as new events
 # define MAGICBOX_BUTTON_TIME 50
-/// @brief The sensitivity of the potentiometers
-# define MAGICBOX_POT_SENS 20
 
 /// @brief Minimum movement value until a joystick movement is tracked
 # define MAGICBOX_JS_MARGIN 30
@@ -17,6 +15,9 @@
 # define MAGICBOX_JS_X_DEF 127
 /// @brief Default value of the Joystick Y-Coordinate when idle
 # define MAGICBOX_JS_Y_DEF 127
+
+/// @brief Maximum power for the LoRa module (in dBm)
+# define MAGICBOX_MAX_LORA_POWER 18
 
 // ##############
 // ##   PINS   ##

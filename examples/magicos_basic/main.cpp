@@ -82,8 +82,6 @@ void setup() {
     // Set integrated LoRa use to TRUE
     magicbox::setup(true);
 
-    // magicbox::events.on_js_used = joystick_event;
-
     // Events
     magicbox::events.on_a1_pressed = button_a1_pressed;
     magicbox::events.on_a2_pressed = button_a2_pressed;

@@ -120,6 +120,7 @@ namespace magicbox {
             }
 
             LoRa.setSyncWord(sync_word);
+            LoRa.setTxPower(MAGICBOX_MAX_LORA_POWER);
             log_debugln(" done!");
 
             // Pinging
