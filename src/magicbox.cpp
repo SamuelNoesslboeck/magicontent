@@ -1,6 +1,8 @@
 # include <Arduino.h>
 # include <LiquidCrystal_I2C.h>
 # include <LoRa.h>
+# include <WiFi.h>
+# include <WiFiUdp.h>
 
 // Sylo
 # include <sylo/logging.hpp>
@@ -13,13 +15,10 @@
 # define LOG_LEVEL LOG_LEVEL_TRACE
 
 namespace magicbox {
-    // Events
-        EventGroup events;
-        ConnHandler connection;
-    //
+    EventGroup events;
 
-    // Variables
-        bool integrated_lora = false;
+    /* Variables */
+        uint8_t remotes;
 
         bool js_sw_pressed = false;
         bool a1_pressed = false;
@@ -30,15 +29,18 @@ namespace magicbox {
 
         int16_t js_x, js_y;
         JoyStickCoord js_coord_x, js_coord_y;
+    /**/
 
-        int16_t last_rssi;
-        uint8_t lora_buff [64];
-    // 
+    /* Configs */
+        const char* UDP_TARGET_IP = nullptr;
+        uint16_t UDP_TARGET_PORT = MAGICBOX_DEFAULT_PORT;
+    /**/
 
-    // Objects
+    /* Objects */
         LiquidCrystal_I2C lcd(0x27, 20, 4);
         RotaryEncoder encoder (MAGICBOX_PIN_RE_SW, MAGICBOX_PIN_RE_DT, MAGICBOX_PIN_RE_CL);
-    // 
+        WiFiUDP udp;
+    /**/
 
     /// Timer components for the MagicBox
     namespace time {
@@ -51,7 +53,7 @@ namespace magicbox {
             re_sw_toff (MAGICBOX_BUTTON_TIME);
 
         Timer 
-            ping_timer (500);
+            state_publish_timer (500);
     }
 
     /// Trigger components for the MagicBox
@@ -60,28 +62,22 @@ namespace magicbox {
         RTrig js_sw_rtrig, a1_rtrig, a2_rtrig, a3_rtrig, ult_rtrig, re_sw_rtrig;
     }
 
-    template<typename T>
-    void mbcp_send_msg(MBCPMsgType type, const T* obj) {
-        LoRa.beginPacket();
-        LoRa.write((uint8_t)type);
-        LoRa.write((const uint8_t*)obj, sizeof(T));
-        LoRa.endPacket();
+    void mbcp_publish_state(MBCPState* state) {
+        if (magicbox::remotes & (uint8_t)RemoteType::LoRa) {
+            LoRa.beginPacket();
+            LoRa.write((const uint8_t*)state, sizeof(MBCPState));
+            LoRa.endPacket();
+        }
+
+        if (magicbox::remotes & (uint8_t)RemoteType::UDP) {
+            udp.beginPacket(magicbox::UDP_TARGET_IP, magicbox::UDP_TARGET_PORT);
+            udp.write((const uint8_t*)state, sizeof(MBCPState));
+            udp.endPacket();
+        }
     }
 
-    // System events
-        void on_ping() {
-            connection.finish_ping(last_rssi);
-            log_debug("> Ping received with ");
-            log_debug(connection.ping);
-            log_debug("ms and ");
-            log_debug(connection.rssi);
-            log_debug(" RSSI \n");
-        }
-    // 
-
-    // Main events
-        void setup(bool integrated_lora, uint16_t sync_word) {
-            // Setup pins
+    /* Main functions */
+        void setup() {
             // Inputs
             pinMode(MAGICBOX_PIN_BAT, INPUT);
 
@@ -104,8 +100,13 @@ namespace magicbox {
             // LCD
             lcd.init();
             lcd.backlight();
+        }
 
-            magicbox::integrated_lora = integrated_lora;
+        void setup_lora(uint16_t sync_word) {
+            if (magicbox::remotes & (uint8_t)RemoteType::LoRa) {
+                log_errorln("> LoRa already initialized!");
+                return;  
+            }
 
             // LoRa
             LoRa.setPins(MAGICBOX_LORA_SS, MAGICBOX_LORA_RST, MAGICBOX_LORA_D0);
@@ -123,31 +124,47 @@ namespace magicbox {
             LoRa.setTxPower(MAGICBOX_MAX_LORA_POWER);
             log_debugln(" done!");
 
-            // Pinging
-            time::ping_timer.set();
-            events.on_ping = on_ping;
+            if (magicbox::remotes == 0) {
+                time::state_publish_timer.set();
+            }
+
+            magicbox::remotes |= (uint8_t)RemoteType::LoRa;
+        }
+
+        void setup_wifi(const char* ssid, const char* password) {
+            log_debug("> Setting up WiFi ");
+            WiFi.mode(WIFI_STA);
+            WiFi.begin(ssid, password);
+
+            while (WiFi.status() != WL_CONNECTED) {
+                log_debug(".");
+                delay(500);
+            }
+
+            log_debugln(" done!");
+        }
+
+        void setup_udp(const char* target_ip, uint16_t target_port, uint16_t own_port) {
+            if (magicbox::remotes & (uint8_t)RemoteType::UDP) {
+                log_errorln("> UDP already initialized!");
+                return;  
+            }
+            
+            log_debug("> Setting up UDP ");
+            udp.begin(own_port);
+            log_debugln(" done!");
+
+            magicbox::UDP_TARGET_IP = target_ip;
+            magicbox::UDP_TARGET_PORT = target_port;   
+
+            if (magicbox::remotes == 0) {
+                time::state_publish_timer.set();
+            }
+
+            magicbox::remotes |= (uint8_t)RemoteType::UDP;
         }
 
         void loop() {
-            // // Connection
-            if (time::ping_timer.has_elapsed()) {
-                MBCPPingMsg msg = { 0 };
-
-                connection.start_ping();
-                mbcp_send_msg(MBCPMsgType::Ping, &msg);
-                time::ping_timer.set();
-            }
-
-            // LoRa incomming
-            int packetSize = LoRa.parsePacket();
-            if (packetSize) {
-                while (LoRa.available()) {
-                    size_t msg_len = LoRa.readBytes(lora_buff, 64);
-                    last_rssi = LoRa.packetRssi();
-                    mbcp_parse_msg(&events, lora_buff, msg_len);
-                }
-            }
-
             // ############
             // ## INPUTS ##
             // ############
@@ -181,13 +198,6 @@ namespace magicbox {
                 if (events.on_js_used) {
                     events.on_js_used(js_coord_x, js_coord_y);
                 }
-
-                // if (integrated_lora) {
-                //     const MBCPJoyStickMsg msg = MBCPJoyStickMsg {
-                //         js_coord_x, js_coord_y
-                //     };
-                //     mbcp_send_msg(MBCPMsgType::JoyStick, &msg);
-                // }
             }
 
             // Buttons
@@ -202,25 +212,11 @@ namespace magicbox {
                 if (events.on_js_sw_pressed) {
                     events.on_js_sw_pressed();
                 }
-
-                // if (integrated_lora) {
-                //     const MBCPButtonMsg msg = MBCPButtonMsg {
-                //         MBCPButtonID::JS
-                //     };
-                //     mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
-                // }
             }
 
             if (trig::a1_rtrig(a1_pressed)) {
                 if (events.on_a1_pressed) {
                     events.on_a1_pressed();
-                }
-
-                if (integrated_lora) {
-                    const MBCPButtonMsg msg = MBCPButtonMsg {
-                        MBCPButtonID::AB1
-                    };
-                    mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
                 }
             }
 
@@ -228,39 +224,17 @@ namespace magicbox {
                 if (events.on_a2_pressed) {
                     events.on_a2_pressed();
                 }
-
-                if (integrated_lora) {
-                    const MBCPButtonMsg msg = MBCPButtonMsg {
-                        MBCPButtonID::AB2
-                    };
-                    mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
-                }
             }
 
             if (trig::a3_rtrig(a3_pressed)) {
                 if (events.on_a3_pressed) {
                     events.on_a3_pressed();
                 }
-
-
-                if (integrated_lora) {
-                    const MBCPButtonMsg msg = MBCPButtonMsg {
-                        MBCPButtonID::AB3
-                    };
-                    mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
-                }
             }
 
             if (trig::ult_rtrig(ult_pressed)) {
                 if (events.on_ult_pressed) {
                     events.on_ult_pressed();
-                }
-
-                if (integrated_lora) {
-                    const MBCPButtonMsg msg = MBCPButtonMsg {
-                        MBCPButtonID::ULT
-                    };
-                    mbcp_send_msg(MBCPMsgType::ButtonPressed, &msg);
                 }
             }
 
@@ -283,7 +257,27 @@ namespace magicbox {
                 }
             }
 
-            // Other loops
+            /* State Publishing */
+            if (time::state_publish_timer.has_elapsed()) {
+                MBCPState state = {
+                    .button_states = (MBCPButtonStates)(
+                        (a1_pressed << 0) |
+                        (a2_pressed << 1) |
+                        (a3_pressed << 2) |
+                        (ult_pressed << 3) |
+                        (re_sw_pressed << 4) |
+                        (js_sw_pressed << 5)
+                    ),
+                    .rel_rot_val = encoder.counter,
+                    .js_x_val = js_x,
+                    .js_y_val = js_y
+                };
+
+                mbcp_publish_state(&state);
+                time::state_publish_timer.set();
+            }
+
+            /* Other loops */
             magicbox::music::loop();
         }
     //

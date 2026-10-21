@@ -15,6 +15,11 @@
 # include "magicontent/music.hpp"
 # include "magicontent/mbcp.hpp"
 
+// This file contains the WiFi credentials for the MagicBox controller and is not traced in git
+# include "../keys/wifi_credentials.hpp"
+
+# define UDP_TARGET_IP "192.168.1.100"
+
 /* BUTTON EVENTS */
     void button_a1_pressed() {
         log_debugln("> Button A1 pressed!");
@@ -79,8 +84,8 @@ void setup() {
     log_debugln("Helper sketch to test the functionality of the MagicBox controller");
     log_info("");
     
-    // Set integrated LoRa use to TRUE
-    magicbox::setup(true);
+    // Setup controller
+    magicbox::setup();
 
     // Events
     magicbox::events.on_a1_pressed = button_a1_pressed;
@@ -94,12 +99,26 @@ void setup() {
 
     // LCD    
     magicbox::lcd.backlight();
-    magicbox::lcd.print("MagicBox");
+    magicbox::lcd.print("====  MagicBox  ====");
 
     magicbox::music::start_playing(&magicbox::music::melodies::STARTUP);
 
+    // LoRa
+    magicbox::setup_lora();     // Use default sync word (0xAA) for LoRa connection
+
     magicbox::lcd.setCursor(0, 1);
-    magicbox::lcd.print("LoRa OK");
+    magicbox::lcd.print("> LoRa OK");
+
+    // WiFi + UDP
+    magicbox::setup_wifi(WIFI_SSID, WIFI_PASSWORD);
+
+    magicbox::lcd.setCursor(0, 2);
+    magicbox::lcd.print("> WiFi OK");
+
+    magicbox::setup_udp(UDP_TARGET_IP);
+
+    magicbox::lcd.setCursor(0, 3);
+    magicbox::lcd.print("> UDP OK");
 }
 
 void loop() {

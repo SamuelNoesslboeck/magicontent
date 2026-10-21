@@ -6,48 +6,41 @@
 # include "events.hpp"
 
 namespace magicbox {
+    /* BUTTON STATES */
+        /// Binary states of the buttons
+        typedef uint8_t MBCPButtonStates;
+
+        inline bool is_a1_pressed(MBCPButtonStates state) {
+            return state & 0x01;
+        }
+
+        inline bool is_a2_pressed(MBCPButtonStates state) {
+            return (state & 0x02) >> 1;
+        }
+
+        inline bool is_a3_pressed(MBCPButtonStates state) {
+            return (state & 0x04) >> 2;
+        }
+
+        inline bool is_ult_pressed(MBCPButtonStates state) {
+            return (state & 0x08) >> 3;
+        }
+
+        inline bool is_re_pressed(MBCPButtonStates state) {
+            return (state & 0x10) >> 4;
+        }
+
+        inline bool is_js_pressed(MBCPButtonStates state) {
+            return (state & 0x20) >> 5;
+        }
+    /**/
+
     /// Defines whether the message is an IO-Event like a button press, a system message or etc.
-    enum class MBCPMsgType : uint8_t {
-        None = 0x00, 
-
-        Ping,
-
-        ButtonPressed, 
-        ButtonReleased,
-        JoyStick,
-        Encoder
-    };
-
-    /// Defines IDs for the different buttons
-    enum class MBCPButtonID : uint8_t {
-        AB1 = 0x01,
-        AB2 = 0x02,
-        AB3 = 0x03,
-        ULT = 0x0F, 
-        RE = 0x11
-    };
-
-    /// Contents of a ping message
-    struct MBCPPingMsg {
-        uint8_t __placeholder;
-    }; 
-
-    /// Contents of a button type message
-    struct MBCPButtonMsg {
-        /// The ID of the button that is being pressed/released
-        MBCPButtonID id;
-    };
-
-    /// Contents of a joystick type message
-    struct MBCPJoyStickMsg {
-        /// Coordinate value for X & Y
-        JoyStickCoord x, y;
-    };
-
-    /// Contents of an encoder type message
-    struct MBCPEncoderMsg {
-        int32_t pos;
-        Direction dir;
+    struct MBCPState {
+        MBCPButtonStates button_states;
+        int8_t rel_rot_val;
+        int8_t js_x_val;
+        int8_t js_y_val;
     };
 
     /// Parses an incoming MBCP message and fires events accordingly
