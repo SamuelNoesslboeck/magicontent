@@ -18,7 +18,7 @@
 // This file contains the WiFi credentials for the MagicBox controller and is not traced in git
 # include "../keys/wifi_credentials.hpp"
 
-# define UDP_TARGET_IP "192.168.1.100"
+# define UDP_TARGET_IP "192.168.178.20"
 
 /* BUTTON EVENTS */
     void button_a1_pressed() {
@@ -101,8 +101,6 @@ void setup() {
     magicbox::lcd.backlight();
     magicbox::lcd.print("====  MagicBox  ====");
 
-    magicbox::music::start_playing(&magicbox::music::melodies::STARTUP);
-
     // LoRa
     magicbox::setup_lora();     // Use default sync word (0xAA) for LoRa connection
 
@@ -119,6 +117,9 @@ void setup() {
 
     magicbox::lcd.setCursor(0, 3);
     magicbox::lcd.print("> UDP OK");
+
+    
+    magicbox::music::start_playing(&magicbox::music::melodies::STARTUP);
 }
 
 void loop() {

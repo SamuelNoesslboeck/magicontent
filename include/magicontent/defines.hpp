@@ -20,7 +20,7 @@
 # define MAGICBOX_MAX_LORA_POWER 18
 
 /// Frequency in which the LoRa pa
-# define MAGICBOX_STATE_PUBLISH_INTERVAL 100
+# define MAGICBOX_STATE_PUBLISH_INTERVAL 20
 
 /// Defalt port to be used for IP connections
 # define MAGICBOX_DEFAULT_PORT 22609

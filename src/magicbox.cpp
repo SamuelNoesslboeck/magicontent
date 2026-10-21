@@ -53,7 +53,7 @@ namespace magicbox {
             re_sw_toff (MAGICBOX_BUTTON_TIME);
 
         Timer 
-            state_publish_timer (500);
+            state_publish_timer (MAGICBOX_STATE_PUBLISH_INTERVAL);
     }
 
     /// Trigger components for the MagicBox
