@@ -29,6 +29,7 @@ namespace magicbox {
 
         bool js_active = false;
 
+        int32_t re_counter_last_state = 0;
         int16_t js_x, js_y;
         JoyStickCoord js_coord_x, js_coord_y;
         JoyStickCoord old_js_coord_x, old_js_coord_y;
@@ -303,6 +304,8 @@ namespace magicbox {
                     events.on_encoder_moved(encoder.counter, Direction::CW);
                 } else if (move == RotaryMove::CCW) {
                     events.on_encoder_moved(encoder.counter, Direction::CCW);
+                } else {
+                    // Error, too many steps at once
                 }
             }
 
@@ -317,10 +320,12 @@ namespace magicbox {
                         (re_sw_active << 4) |
                         (js_sw_active << 5)
                     ),
-                    .rel_rot_val = encoder.counter,
+                    // Downcast safe, RE will not move more than 127 steps in state update interval
+                    .rel_rot_val = (int8_t)(encoder.counter - re_counter_last_state),  
                     .js_x_val = js_x,
                     .js_y_val = js_y
                 };
+                re_counter_last_state = encoder.counter;
 
                 mbcp_publish_state(&state);
                 time::state_publish_timer.set();
