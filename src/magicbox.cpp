@@ -20,15 +20,18 @@ namespace magicbox {
     /* Variables */
         uint8_t remotes;
 
-        bool js_sw_pressed = false;
-        bool a1_pressed = false;
-        bool a2_pressed = false;
-        bool a3_pressed = false;
-        bool ult_pressed = false;
-        bool re_sw_pressed = false;
+        bool a1_active = false;
+        bool a2_active = false;
+        bool a3_active = false;
+        bool ult_active = false;
+        bool re_sw_active = false;
+        bool js_sw_active = false;
+
+        bool js_active = false;
 
         int16_t js_x, js_y;
         JoyStickCoord js_coord_x, js_coord_y;
+        JoyStickCoord old_js_coord_x, old_js_coord_y;
     /**/
 
     /* Configs */
@@ -165,86 +168,132 @@ namespace magicbox {
         }
 
         void loop() {
-            // ############
-            // ## INPUTS ##
-            // ############
-            // Joystick
-            // Reduce accuracy to 8 bit and remove default pos
-            js_x = (int16_t)(analogRead(MAGICBOX_PIN_JS_X) >> 4) - (int16_t)MAGICBOX_JS_X_DEF;   
-            js_y = (int16_t)(analogRead(MAGICBOX_PIN_JS_Y) >> 4) - (int16_t)MAGICBOX_JS_Y_DEF;   
+            /* Joystick */
+                // Reduce accuracy to 8 bit and remove default pos
+                js_x = (int16_t)(analogRead(MAGICBOX_PIN_JS_X) >> 4) - (int16_t)MAGICBOX_JS_X_DEF;   
+                js_y = (int16_t)(analogRead(MAGICBOX_PIN_JS_Y) >> 4) - (int16_t)MAGICBOX_JS_Y_DEF;   
 
-            if (abs(js_x) > MAGICBOX_JS_MARGIN) {
-                if (js_x > 0) {
-                    js_coord_x = JoyStickCoord::Positive;
+                if (abs(js_x) > MAGICBOX_JS_MARGIN) {
+                    if (js_x < 0) {     // Inverting because of built-in orientation
+                        js_coord_x = JoyStickCoord::Positive;
+                    } else {
+                        js_coord_x = JoyStickCoord::Negative;
+                    }
                 } else {
-                    js_coord_x = JoyStickCoord::Negative;
+                    js_coord_x = JoyStickCoord::Null;
                 }
-            } else {
-                js_coord_x = JoyStickCoord::None;
-            }
 
-            if (abs(js_y) > MAGICBOX_JS_MARGIN) {
-                // Inverted for correct orientation
-                if (js_y < 0) {
-                    js_coord_y = JoyStickCoord::Positive;
+                if (abs(js_y) > MAGICBOX_JS_MARGIN) {
+                    // Inverted for correct orientation
+                    if (js_y > 0) {
+                        js_coord_y = JoyStickCoord::Positive;
+                    } else {
+                        js_coord_y = JoyStickCoord::Negative;
+                    }
                 } else {
-                    js_coord_y = JoyStickCoord::Negative;
+                    js_coord_y = JoyStickCoord::Null;
                 }
-            } else {
-                js_coord_y = JoyStickCoord::None;
-            }
 
-            if ((js_coord_x != JoyStickCoord::None) || (js_coord_y != JoyStickCoord::None)) {
-                if (events.on_js_used) {
-                    events.on_js_used(js_coord_x, js_coord_y);
+                if ((js_coord_x != JoyStickCoord::Null) || (js_coord_y != JoyStickCoord::Null)) {
+                    js_active = true;
+                    if (events.on_js_used) {
+                        events.on_js_used(js_coord_x, js_coord_y);
+                    }
+                } else {
+                    js_active = false;
                 }
-            }
+
+                if ((js_coord_x != old_js_coord_x) || (js_coord_y != old_js_coord_y)) {
+                    if (events.on_js_changed) {
+                        events.on_js_changed(old_js_coord_x, old_js_coord_y, js_coord_x, js_coord_y);
+                    }
+                }
+
+                old_js_coord_x = js_coord_x;
+                old_js_coord_y = js_coord_y;
+            /**/
 
             // Buttons
-            js_sw_pressed = time::js_sw_toff(digitalRead(MAGICBOX_PIN_JS_SW));
-            a1_pressed = time::a1_toff(digitalRead(MAGICBOX_PIN_BT_A1));
-            a2_pressed = time::a2_toff(digitalRead(MAGICBOX_PIN_BT_A2));
-            a3_pressed = time::a3_toff(digitalRead(MAGICBOX_PIN_BT_A3));
-            ult_pressed = time::ult_toff(digitalRead(MAGICBOX_PIN_BT_ULT));
+            a1_active = time::a1_toff(digitalRead(MAGICBOX_PIN_BT_A1));
+            a2_active = time::a2_toff(digitalRead(MAGICBOX_PIN_BT_A2));
+            a3_active = time::a3_toff(digitalRead(MAGICBOX_PIN_BT_A3));
+            ult_active = time::ult_toff(digitalRead(MAGICBOX_PIN_BT_ULT));
+            re_sw_active = time::re_sw_toff(encoder.check_switch());
+            js_sw_active = time::js_sw_toff(digitalRead(MAGICBOX_PIN_JS_SW));
 
             // On pressed
-            if (trig::js_sw_rtrig(js_sw_pressed)) {
-                if (events.on_js_sw_pressed) {
-                    events.on_js_sw_pressed();
-                }
-            }
-
-            if (trig::a1_rtrig(a1_pressed)) {
+            if (trig::a1_rtrig(a1_active)) {
                 if (events.on_a1_pressed) {
                     events.on_a1_pressed();
                 }
             }
 
-            if (trig::a2_rtrig(a2_pressed)) {
+            if (trig::a2_rtrig(a2_active)) {
                 if (events.on_a2_pressed) {
                     events.on_a2_pressed();
                 }
             }
 
-            if (trig::a3_rtrig(a3_pressed)) {
+            if (trig::a3_rtrig(a3_active)) {
                 if (events.on_a3_pressed) {
                     events.on_a3_pressed();
                 }
             }
 
-            if (trig::ult_rtrig(ult_pressed)) {
+            if (trig::ult_rtrig(ult_active)) {
                 if (events.on_ult_pressed) {
                     events.on_ult_pressed();
                 }
             }
 
-            if (trig::re_sw_rtrig(time::re_sw_toff(encoder.check_switch()))) {
+            if (trig::re_sw_rtrig(re_sw_active)) {
                 if (events.on_encoder_sw_pressed) {
                     events.on_encoder_sw_pressed();
                 }
             }
 
+            if (trig::js_sw_rtrig(js_sw_active)) {
+                if (events.on_js_sw_pressed) {
+                    events.on_js_sw_pressed();
+                }
+            }
+
             // On release
+            if (trig::a1_ftrig(a1_active)) {
+                if (events.on_a1_released) {
+                    events.on_a1_released();
+                }
+            }
+
+            if (trig::a2_ftrig(a2_active)) {
+                if (events.on_a2_released) {
+                    events.on_a2_released();
+                }
+            }
+
+            if (trig::a3_ftrig(a3_active)) {
+                if (events.on_a3_released) {
+                    events.on_a3_released();
+                }
+            }
+
+            if (trig::ult_ftrig(ult_active)) {
+                if (events.on_ult_released) {
+                    events.on_ult_released();
+                }
+            }
+
+            if (trig::re_sw_ftrig(re_sw_active)) {
+                if (events.on_encoder_sw_released) {
+                    events.on_encoder_sw_released();
+                }
+            }
+
+            if (trig::js_sw_ftrig(js_sw_active)) {
+                if (events.on_js_sw_released) {
+                    events.on_js_sw_released();
+                }
+            }
 
             // Rotary encoder
             if (events.on_encoder_moved) {
@@ -261,12 +310,12 @@ namespace magicbox {
             if (time::state_publish_timer.has_elapsed()) {
                 MBCPState state = {
                     .button_states = (MBCPButtonStates)(
-                        (a1_pressed << 0) |
-                        (a2_pressed << 1) |
-                        (a3_pressed << 2) |
-                        (ult_pressed << 3) |
-                        (re_sw_pressed << 4) |
-                        (js_sw_pressed << 5)
+                        (a1_active << 0) |
+                        (a2_active << 1) |
+                        (a3_active << 2) |
+                        (ult_active << 3) |
+                        (re_sw_active << 4) |
+                        (js_sw_active << 5)
                     ),
                     .rel_rot_val = encoder.counter,
                     .js_x_val = js_x,

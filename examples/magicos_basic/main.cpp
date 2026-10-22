@@ -22,40 +22,46 @@
 
 /* BUTTON EVENTS */
     void button_a1_pressed() {
-        log_debugln("> Button A1 pressed!");
-        magicbox::music::start_playing(
-            &magicbox::music::melodies::BUTTON_A1
-        );
+        magicbox::lcd.setCursor(12, 1);
+        magicbox::lcd.print('O');
+    }
+
+    void button_a1_released() {
+        magicbox::lcd.setCursor(12, 1);
+        magicbox::lcd.print(' ');
     }
 
     void button_a2_pressed() {
-        log_debugln("> Button A2 pressed!");
-        magicbox::music::start_playing(
-            &magicbox::music::melodies::BUTTON_A2
-        );
+        magicbox::lcd.setCursor(12, 2);
+        magicbox::lcd.print('O');
+    }
+
+    void button_a2_released() {
+        magicbox::lcd.setCursor(12, 2);
+        magicbox::lcd.print(' ');
     }
 
     void button_a3_pressed() {
-        log_debugln("> Button A3 pressed!");
-        magicbox::music::start_playing(
-            &magicbox::music::melodies::BUTTON_A3
-        );
+        magicbox::lcd.setCursor(12, 3);
+        magicbox::lcd.print('O');
+    }
+
+    void button_a3_released() {
+        magicbox::lcd.setCursor(12, 3);
+        magicbox::lcd.print(' ');
     }
 
     void button_ult_pressed() {
-        log_debugln("> Button ULT pressed!");
+        magicbox::lcd.setCursor(13, 3);
+        magicbox::lcd.print('O');
         magicbox::music::start_playing(
             &magicbox::music::melodies::BUTTON_ULT
         );
+    }
 
-        // magicbox::MBCPButtonMsg msg = {
-        //     magicbox::MBCPButtonID::ULT
-        // };
-
-        // LoRa.beginPacket();
-        // LoRa.write((uint8_t)magicbox::MBCPMsgType::ButtonPressed);
-        // LoRa.write((const uint8_t*)&msg, sizeof(magicbox::MBCPButtonMsg));
-        // LoRa.endPacket();   
+    void button_ult_released() {
+        magicbox::lcd.setCursor(13, 3);
+        magicbox::lcd.print(' ');
     }
 /**/
 
@@ -66,8 +72,24 @@
 /**/
 
 /* JOYSTICK EVENTS */
-    void button_js_used() {
-        log_debugln("> Button JS used!");
+    void button_js_sw_pressed() {
+        magicbox::lcd.setCursor(18, 2);
+        magicbox::lcd.print('O');
+    }
+
+    void button_js_sw_released() {
+        magicbox::lcd.setCursor(18, 2);
+        magicbox::lcd.print(' ');
+    }
+
+    void js_changed(magicbox::JoyStickCoord old_x, magicbox::JoyStickCoord old_y, magicbox::JoyStickCoord x, magicbox::JoyStickCoord y) {
+        magicbox::lcd.setCursor(18 - (int8_t)old_y, 2 - (int8_t)old_x);    
+        magicbox::lcd.print(' ');
+
+        if (magicbox::js_active) {
+            magicbox::lcd.setCursor(18 - (int8_t)y, 2 - (int8_t)x);
+            magicbox::lcd.print('X');
+        }
     }
 /**/
 
@@ -78,7 +100,7 @@ void setup() {
     log_debugln("#    MAGICBOX - Testing sketch    #");
     log_debugln("###################################");
     log_debugln("");
-    log_infoln("> Version: 0.1.0");
+    log_infoln("> Version: 2.1.0");
     log_debugln("");
     log_debugln("(c) Sy 2025  - CornerLab product");
     log_debugln("Helper sketch to test the functionality of the MagicBox controller");
@@ -92,10 +114,16 @@ void setup() {
     magicbox::events.on_a2_pressed = button_a2_pressed;
     magicbox::events.on_a3_pressed = button_a3_pressed;
     magicbox::events.on_ult_pressed = button_ult_pressed;
-
     magicbox::events.on_encoder_sw_pressed = button_re_pressed;
+    magicbox::events.on_js_sw_pressed = button_js_sw_pressed;
 
-    magicbox::events.on_js_sw_pressed = button_js_used;
+    magicbox::events.on_a1_released = button_a1_released;
+    magicbox::events.on_a2_released = button_a2_released;
+    magicbox::events.on_a3_released = button_a3_released;
+    magicbox::events.on_ult_released = button_ult_released;
+    magicbox::events.on_js_sw_released = button_js_sw_released;
+
+    magicbox::events.on_js_changed = js_changed;
 
     // LCD    
     magicbox::lcd.backlight();
@@ -116,7 +144,7 @@ void setup() {
     magicbox::setup_udp(UDP_TARGET_IP);
 
     magicbox::lcd.setCursor(0, 3);
-    magicbox::lcd.print("> UDP OK");
+    magicbox::lcd.print("> UDP  OK");
 
     
     magicbox::music::start_playing(&magicbox::music::melodies::STARTUP);

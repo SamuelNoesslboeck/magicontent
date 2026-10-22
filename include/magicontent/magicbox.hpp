@@ -33,17 +33,19 @@ namespace magicbox {
         extern uint8_t remotes;
 
         /// Whether the JoyStick-Switch is currently being pressed (not an event)
-        extern bool js_sw_pressed;
+        extern bool js_sw_active;
         /// Whether the first ability switch is currently being pressed (not an event)
-        extern bool a1_pressed;
+        extern bool a1_active;
         /// Whether the second ability switch is currently being pressed (not an event)
-        extern bool a2_pressed;
+        extern bool a2_active;
         /// Whether the third ability switch is currently being pressed (not an event)
-        extern bool a3_pressed;
+        extern bool a3_active;
         /// Whether the ultimate ability switch is currently being pressed (not an event)
-        extern bool ult_pressed;
+        extern bool ult_active;
         /// Whether the rotary encoder switch is currently being pressed (not an event)
-        extern bool re_sw_pressed;
+        extern bool re_sw_active;
+        /// Whether or not the joystick is being used
+        extern bool js_active;
 
         /// Raw input numbers of the JoyStick
         extern int16_t js_x, js_y;

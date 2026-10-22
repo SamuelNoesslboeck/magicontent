@@ -8,28 +8,25 @@ namespace magicbox {
     /// Indicates whether the a JoyStick-Coordinate (X/Y) is positive, negative or not moved at all
     enum class JoyStickCoord : int8_t {
         Positive = 1,
-        None = 0,
+        Null = 0,
         Negative = -1
     };
 
-    /// Event for reiving a ping trace
-    typedef void (*PingEvent)();
     /// Event for Button press & release
     typedef void (*ButtonEvent)();
     /// Event for movements of a rotary encoder
     typedef void (*EncoderEvent)(int32_t pos, Direction dir);
     /// Event for JoyStick-Movements
     typedef void (*JoyStickEvent)(JoyStickCoord x, JoyStickCoord y);
-    /// Event for Potentiometer-Movements
-    typedef void (*PotentioEvent)(uint16_t value, int16_t delta);
+        /// Event for JoyStick-Movements
+    typedef void (*JoyStickChangedEvent)(JoyStickCoord x_old, JoyStickCoord y_old, JoyStickCoord x_new, JoyStickCoord y_new);
 
     /// Structure containing all the events for the MagicBox
     struct EventGroup {
-        /// Event for reiving a ping trace from the controller/receiving device
-        PingEvent on_ping = nullptr;
-
         /// Triggers each loop() iteration when the joystick is above the threshold positions
         JoyStickEvent on_js_used = nullptr;
+        /// Triggers each time the joystick orientation in changed
+        JoyStickChangedEvent on_js_changed = nullptr;
         /// Triggers every time a difference in the encoder position has been recorded
         EncoderEvent on_encoder_moved = nullptr;
         

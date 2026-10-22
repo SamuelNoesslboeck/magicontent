@@ -10,7 +10,7 @@
 # define MAGICBOX_BUTTON_TIME 50
 
 /// Minimum movement value until a joystick movement is tracked
-# define MAGICBOX_JS_MARGIN 30
+# define MAGICBOX_JS_MARGIN 50
 /// Default value of the Joystick X-Coordinate when idle
 # define MAGICBOX_JS_X_DEF 127
 /// Default value of the Joystick Y-Coordinate when idle
