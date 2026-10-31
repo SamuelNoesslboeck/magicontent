@@ -1,8 +1,8 @@
-// ###################################
-// #    MAGICBOX - TESTING SKETCH    #
-// ###################################
+// ###########################################
+// #    MAGICBOX - BASIC OPERATING SYSTEM    #
+// ###########################################
 //
-// A simple hardware testing sketch for the SpellBox controller
+// A simple hardware testing sketch for the MagicBox controller
 
 # include <LoRa.h>
 # include <SPI.h>
@@ -16,9 +16,9 @@
 # include "magicontent/mbcp.hpp"
 
 // This file contains the WiFi credentials for the MagicBox controller and is not traced in git
-# include "../keys/wifi_credentials.hpp"
+# include "./keys/wifi_credentials.hpp"
 
-# define UDP_TARGET_IP "192.168.178.20"
+# define UDP_TARGET_IP "192.168.1.116"
 
 /* BUTTON EVENTS */
     void button_a1_pressed() {

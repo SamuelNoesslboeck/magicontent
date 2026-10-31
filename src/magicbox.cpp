@@ -322,8 +322,8 @@ namespace magicbox {
                     ),
                     // Downcast safe, RE will not move more than 127 steps in state update interval
                     .rel_rot_val = (int8_t)(encoder.counter - re_counter_last_state),  
-                    .js_x_val = js_x,
-                    .js_y_val = js_y
+                    .js_x_val = (int8_t)js_coord_x,
+                    .js_y_val = (int8_t)js_coord_y
                 };
                 re_counter_last_state = encoder.counter;
 
